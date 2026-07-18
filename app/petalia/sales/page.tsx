@@ -270,7 +270,8 @@ function handleSave() {
   ))}
 </tbody>
 
-          </table>
+         </table>
+</div>
 
         </div>
 

@@ -4,22 +4,23 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
 
     const result = await signIn("credentials", {
-      username,
-      password,
-      redirect: true,
-      callbackUrl: "/",
-    });
+  email,
+  password,
+  redirect: false,
+});
 
-    if (result?.error) {
-      alert("Invalid username or password");
-    }
+if (result?.error) {
+  alert("Invalid email or password");
+} else {
+  window.location.href = "/";
+}
   }
 
   return (
@@ -33,12 +34,11 @@ export default function LoginPage() {
         </h1>
 
         <input
-          className="w-full border p-3 rounded-xl mb-4"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-
+  className="w-full border p-3 rounded-xl mb-4"
+  placeholder="Email"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+/>
         <input
           type="password"
           className="w-full border p-3 rounded-xl mb-6"

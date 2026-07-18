@@ -94,7 +94,7 @@ function addMaterial() {
   if (!materialName.trim()) return;
 
 
-  
+    
 
   if (!materialName.trim()) return;
 

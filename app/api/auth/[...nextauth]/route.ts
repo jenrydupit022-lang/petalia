@@ -5,19 +5,21 @@ const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
+
       credentials: {
-        username: {},
+        email: {},
         password: {},
       },
 
       async authorize(credentials) {
         if (
-          credentials?.username === "admin" &&
-          credentials?.password === "petalia123"
+          credentials?.email === "admin@petalia.com" &&
+          credentials?.password === "admin123"
         ) {
           return {
             id: "1",
             name: "Administrator",
+            email: "admin@petalia.com",
           };
         }
 
@@ -25,10 +27,6 @@ const handler = NextAuth({
       },
     }),
   ],
-
-  pages: {
-    signIn: "/login",
-  },
 
   secret: process.env.NEXTAUTH_SECRET,
 });
