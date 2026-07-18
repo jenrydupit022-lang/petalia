@@ -56,18 +56,19 @@ const [menuOpen, setMenuOpen] = useState(false);
 []);
 
   return (
-    <><div className="md:hidden fixed top-4 left-4 z-50">
-      {menuOpen && (
+    <>{menuOpen && (
   <div
-    className="fixed inset-0 bg-black/40 z-30"
+    className="fixed inset-0 bg-black/10 z-30"
     onClick={() => setMenuOpen(false)}
   />
 )}
+
+<div className="md:hidden fixed top-4 left-4 z-50">
   <button
     onClick={() => setMenuOpen(!menuOpen)}
     className="bg-pink-500 text-white p-3 rounded-xl shadow-lg"
   >
-    ☰
+    {menuOpen ? "✕" : "☰"}
   </button>
 </div>
     <aside
@@ -76,7 +77,8 @@ const [menuOpen, setMenuOpen] = useState(false);
     top-0 left-0
     h-screen
     w-72
-    bg-white
+    overflow-y-auto
+    bg-white/95 backdrop-blur-xl
     shadow-xl
     p-4 md:p-6
     z-40
