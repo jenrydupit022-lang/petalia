@@ -94,10 +94,10 @@ function handleSave() {
   }
 
   return (
-    <main className="min-h-screen bg-pink-50 p-8">
-      <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-8">
+    <main className="min-h-screen bg-pink-50 p-4 md:p-8">
+      <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-5 md:p-8">
 
-        <h1 className="text-4xl font-bold text-pink-600 mb-8">
+        <h1 className="text-2xl md:text-4xl font-bold text-pink-600 mb-8">
           🌸 Bouquet Sales
         </h1>
 
@@ -156,7 +156,7 @@ function handleSave() {
        <div className="bg-pink-100 rounded-2xl mt-8 p-6">
   <h2 className="text-xl font-bold">Total Sale</h2>
 
-  <p className="text-4xl font-bold text-pink-600 mt-2">
+  <p className="text-2xl md:text-4xl font-bold text-pink-600 mt-2">
     ₱{total.toLocaleString()}
   </p>
 </div>
@@ -170,7 +170,7 @@ function handleSave() {
 
         <div className="mt-10">
 
-         <h2 className="text-2xl font-bold mb-4">
+         <h2 className="text-xl md:text-2xl font-bold mb-4">
   Sales History
 </h2>
 
@@ -198,7 +198,8 @@ function handleSave() {
 
 
 
-          <table className="w-full border border-gray-200">
+          <div className="overflow-x-auto">
+  <table className="min-w-[700px] w-full border border-gray-200">
 
             <thead className="bg-pink-100">
 

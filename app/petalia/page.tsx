@@ -94,27 +94,27 @@ const COLORS = [
 
     <Sidebar />
 
-    <div className="flex-1 p-8">
-<div className="flex justify-between items-center">
+    <div className="flex-1 p-4 md:p-8">
+<div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
   <div>
-    <h1 className="text-5xl font-bold text-pink-600">
+    <h1 className="text-3xl md:text-5xl font-bold text-pink-600">
   🌸 {businessName}
 </h1>
 
-<p className="text-gray-500 mt-2">
+<p className="text-sm md:text-base text-gray-500 mt-2">
   {websiteTitle}
 </p>
   </div>
 
   <button
     onClick={() => signOut({ callbackUrl: "/login" })}
-    className="bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl font-semibold"
+   className="w-full md:w-auto bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl font-semibold"
   >
     🚪 Logout
   </button>
 </div>
   
-<div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
          <div className="bg-white rounded-3xl shadow-md p-6 border border-pink-100 hover:shadow-xl transition">
            <h2 className="text-gray-500">
   💰 Total Sales

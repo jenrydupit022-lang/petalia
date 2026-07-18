@@ -15,6 +15,7 @@ const [profileName, setProfileName] = useState("Administrator");
 const [profileRole, setProfileRole] = useState("Administrator");
 const [profilePhoto, setProfilePhoto] = useState("");
 const [lowStockCount, setLowStockCount] = useState(0);
+const [menuOpen, setMenuOpen] = useState(false);
 
 
   useEffect(() => {
@@ -55,9 +56,37 @@ const [lowStockCount, setLowStockCount] = useState(0);
 []);
 
   return (
-    <aside className="w-72 min-h-screen bg-white shadow-xl p-6">
+    <><div className="md:hidden fixed top-4 left-4 z-50">
+      {menuOpen && (
+  <div
+    className="fixed inset-0 bg-black/40 z-30"
+    onClick={() => setMenuOpen(false)}
+  />
+)}
+  <button
+    onClick={() => setMenuOpen(!menuOpen)}
+    className="bg-pink-500 text-white p-3 rounded-xl shadow-lg"
+  >
+    ☰
+  </button>
+</div>
+    <aside
+  className={`
+    fixed md:static
+    top-0 left-0
+    h-screen
+    w-72
+    bg-white
+    shadow-xl
+    p-4 md:p-6
+    z-40
+    transition-transform duration-300
+    ${menuOpen ? "translate-x-0" : "-translate-x-full"}
+    md:translate-x-0
+  `}
+>
 
-      <h1 className="text-3xl font-bold text-pink-600 mb-10">
+     <h1 className="text-2xl md:text-3xl font-bold text-pink-600 mb-6 md:mb-10">
         🌸 Petalia
       </h1>
 <div className="bg-pink-50 rounded-2xl p-4 mb-8">
@@ -65,10 +94,10 @@ const [lowStockCount, setLowStockCount] = useState(0);
  {profilePhoto ? (
   <img
     src={profilePhoto}
-    className="w-20 h-20 rounded-full object-cover mb-3"
+   className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover mb-3"
   />
 ) : (
-  <div className="text-4xl mb-2">
+  <div className="text-3xl md:text-4xl mb-2">
     👤
   </div>
 )}
@@ -84,12 +113,12 @@ const [lowStockCount, setLowStockCount] = useState(0);
   </p>
 
 </div>
-      <nav className="space-y-4">
+      <nav className="space-y-2 md:space-y-4">
 
         
         <Link
   href="/petalia/profile"
-className={`block p-3 rounded-xl ${
+className={`block p-2 md:p-3 rounded-xl ${
   pathname === "/petalia/profile"
     ? "bg-pink-200 text-pink-700"
     : "hover:bg-pink-100"
@@ -99,22 +128,37 @@ className={`block p-3 rounded-xl ${
 </Link>
 
         <Link
-          href="/petalia/sales"
-          className="block p-3 rounded-xl hover:bg-pink-100"
-        >
-          🌸 Sales
-        </Link>
+  href="/petalia/sales"
+  onClick={() => setMenuOpen(false)}
+  className={`block p-2 md:p-3 rounded-xl ${
+  pathname === "/petalia/sales"
+    ? "bg-pink-200 text-pink-700"
+    : "hover:bg-pink-100"
+}`}
+>
+  🌸 Sales
+</Link>
 
         <Link
-          href="/petalia/expenses"
-          className="block p-3 rounded-xl hover:bg-pink-100"
-        >
-          💸 Expenses
-        </Link>
+  href="/petalia/expenses"
+  onClick={() => setMenuOpen(false)}
+  className={`block p-2 md:p-3 rounded-xl ${
+    pathname === "/petalia/expenses"
+      ? "bg-pink-200 text-pink-700"
+      : "hover:bg-pink-100"
+  }`}
+>
+  💸 Expenses
+</Link>
 
-       <Link
+      <Link
   href="/petalia/inventory"
-  className="block p-3 rounded-xl hover:bg-pink-100 flex justify-between items-center"
+  onClick={() => setMenuOpen(false)}
+className={`block p-2 md:p-3 rounded-xl flex justify-between items-center ${
+  pathname === "/petalia/inventory"
+    ? "bg-pink-200 text-pink-700"
+    : "hover:bg-pink-100"
+}`}
 >
   <span>📦 Inventory</span>
 
@@ -127,35 +171,55 @@ className={`block p-3 rounded-xl ${
 
 <Link
   href="/petalia/bouquets"
-  className="block p-3 rounded-xl hover:bg-pink-100"
+  onClick={() => setMenuOpen(false)}
+  className={`block p-2 md:p-3 rounded-xl ${
+    pathname === "/petalia/bouquets"
+      ? "bg-pink-200 text-pink-700"
+      : "hover:bg-pink-100"
+  }`}
 >
   💐 Bouquet Catalog
 </Link>
         <Link
-          href="/petalia/reports"
-          className="block p-3 rounded-xl hover:bg-pink-100"
-        >
-          📄 Reports
-        </Link>
+  href="/petalia/reports"
+  onClick={() => setMenuOpen(false)}
+  className={`block p-2 md:p-3 rounded-xl ${
+    pathname === "/petalia/reports"
+      ? "bg-pink-200 text-pink-700"
+      : "hover:bg-pink-100"
+  }`}
+>
+  📄 Reports
+</Link>
 
         <Link
-          href="/petalia/settings"
-          className="block p-3 rounded-xl hover:bg-pink-100"
-        >
-          ⚙️ Settings
-        </Link>
+  href="/petalia/settings"
+  onClick={() => setMenuOpen(false)}
+  className={`block p-2 md:p-3 rounded-xl ${
+    pathname === "/petalia/settings"
+      ? "bg-pink-200 text-pink-700"
+      : "hover:bg-pink-100"
+  }`}
+>
+  ⚙️ Settings
+</Link>
+      
 
       </nav>
 
 
       <button
-        onClick={() => signOut({callbackUrl:"/login"})}
-        className="mt-10 w-full bg-red-500 text-white p-3 rounded-xl"
+        onClick={() => {
+  setMenuOpen(false);
+  signOut({ callbackUrl: "/login" });
+}}
+        className="mt-6 md:mt-10 w-full bg-red-500 text-white p-3 rounded-xl"
       >
         🚪 Logout
       </button>
 
 
     </aside>
+    </>
   );
 }
