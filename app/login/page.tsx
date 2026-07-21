@@ -1,7 +1,7 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -10,17 +10,17 @@ export default function LoginPage() {
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
 
-    const result = await signIn("credentials", {
-  email,
-  password,
-  redirect: false,
-});
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-if (result?.error) {
-  alert("Invalid email or password");
-} else {
-  window.location.href = "/";
-}
+    if (error) {
+      alert("Invalid email or password");
+      return;
+    }
+
+    window.location.href = "/petalia";
   }
 
   return (
@@ -29,22 +29,24 @@ if (result?.error) {
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-3xl shadow-xl w-96"
       >
+
         <h1 className="text-3xl font-bold text-pink-600 mb-6 text-center">
           🌸 Petalia Admin Login
         </h1>
 
         <input
-  className="w-full border p-3 rounded-xl mb-4"
-  placeholder="Email"
-  value={email}
-  onChange={(e) => setEmail(e.target.value)}
-/>
+          className="w-full border p-3 rounded-xl mb-4"
+          placeholder="Email"
+          value={email}
+          onChange={(e)=>setEmail(e.target.value)}
+        />
+
         <input
           type="password"
           className="w-full border p-3 rounded-xl mb-6"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e)=>setPassword(e.target.value)}
         />
 
         <button
@@ -52,6 +54,7 @@ if (result?.error) {
         >
           Login
         </button>
+
       </form>
     </main>
   );
