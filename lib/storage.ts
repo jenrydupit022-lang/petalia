@@ -1,11 +1,3 @@
-
-export function updateSale(updatedSale: Sale) {
-  const sales = getSales().map((sale) =>
-    sale.id === updatedSale.id ? updatedSale : sale
-  );
-
-  localStorage.setItem("sales", JSON.stringify(sales));
-}
 export type Sale = {
   id: number;
   date: string;
@@ -21,8 +13,17 @@ export type Expense = {
   date: string;
   category: string;
   item: string;
+  quantity: number;
   cost: number;
 };
+
+export type Inventory = {
+  id: number;
+  item: string;
+  stock: number;
+};
+
+// ====================== SALES ======================
 
 export function getSales(): Sale[] {
   if (typeof window === "undefined") return [];
@@ -51,37 +52,43 @@ export function saveSale(sale: Sale) {
   const sales = getSales();
   sales.push(sale);
 
-  const updatedInventory = inventory.map((i) => {
-    if (
-      i.item.toLowerCase() ===
-      sale.bouquet.toLowerCase().replace(" bouquet", "")
-    ) {
-      return {
-        ...i,
-        stock: i.stock - sale.quantity,
-      };
-    }
-
-    return i;
-  });
+  const updatedInventory = inventory.map((i) =>
+    i.item.toLowerCase() ===
+    sale.bouquet.toLowerCase().replace(" bouquet", "")
+      ? {
+          ...i,
+          stock: i.stock - sale.quantity,
+        }
+      : i
+  );
 
   localStorage.setItem(
     "inventory",
     JSON.stringify(updatedInventory)
   );
 
-  window.dispatchEvent(
-    new Event("inventoryUpdated")
-  );
-
   localStorage.setItem(
     "sales",
     JSON.stringify(sales)
   );
+
+  window.dispatchEvent(new Event("inventoryUpdated"));
 }
 
+export function updateSale(updatedSale: Sale) {
+  const sales = getSales().map((sale) =>
+    sale.id === updatedSale.id ? updatedSale : sale
+  );
 
+  localStorage.setItem("sales", JSON.stringify(sales));
+}
 
+export function deleteSale(id: number) {
+  const sales = getSales().filter((sale) => sale.id !== id);
+  localStorage.setItem("sales", JSON.stringify(sales));
+}
+
+// ====================== EXPENSES ======================
 
 export function getExpenses(): Expense[] {
   if (typeof window === "undefined") return [];
@@ -91,24 +98,55 @@ export function getExpenses(): Expense[] {
 export function saveExpense(expense: Expense) {
   const expenses = getExpenses();
   expenses.push(expense);
-  localStorage.setItem("expenses", JSON.stringify(expenses));
-}
-export function deleteSale(id: number) {
-  const sales = getSales().filter((sale) => sale.id !== id);
-  localStorage.setItem("sales", JSON.stringify(sales));
+
+  localStorage.setItem(
+    "expenses",
+    JSON.stringify(expenses)
+  );
+
+  if (expense.category === "Inventory") {
+    const inventory = getInventory();
+
+    const existing = inventory.find(
+      (i) =>
+        i.item.toLowerCase() ===
+        expense.item.toLowerCase()
+    );
+
+    if (existing) {
+      existing.stock += expense.quantity;
+    } else {
+      inventory.push({
+        id: Date.now(),
+        item: expense.item,
+        stock: expense.quantity,
+      });
+    }
+
+    localStorage.setItem(
+      "inventory",
+      JSON.stringify(inventory)
+    );
+
+    window.dispatchEvent(new Event("inventoryUpdated"));
+  }
 }
 
 export function deleteExpense(id: number) {
-  const expenses = getExpenses().filter((expense) => expense.id !== id);
-  localStorage.setItem("expenses", JSON.stringify(expenses));
+  const expenses = getExpenses().filter(
+    (expense) => expense.id !== id
+  );
+
+  localStorage.setItem(
+    "expenses",
+    JSON.stringify(expenses)
+  );
 }
-export type Inventory = {
-  id: number;
-  item: string;
-  stock: number;
-};
+
+// ====================== INVENTORY ======================
 
 export function getInventory(): Inventory[] {
+  if (typeof window === "undefined") return [];
   return JSON.parse(localStorage.getItem("inventory") || "[]");
 }
 
@@ -117,7 +155,8 @@ export function saveInventory(item: Inventory) {
 
   const existing = inventory.find(
     (i) =>
-      i.item.toLowerCase() === item.item.toLowerCase()
+      i.item.toLowerCase() ===
+      item.item.toLowerCase()
   );
 
   if (existing) {
@@ -130,11 +169,21 @@ export function saveInventory(item: Inventory) {
     "inventory",
     JSON.stringify(inventory)
   );
+
+  window.dispatchEvent(new Event("inventoryUpdated"));
 }
 
 export function deleteInventory(id: number) {
-  const inventory = getInventory().filter((i) => i.id !== id);
-  localStorage.setItem("inventory", JSON.stringify(inventory));
+  const inventory = getInventory().filter(
+    (i) => i.id !== id
+  );
+
+  localStorage.setItem(
+    "inventory",
+    JSON.stringify(inventory)
+  );
+
+  window.dispatchEvent(new Event("inventoryUpdated"));
 }
 
 export function updateInventory(updated: Inventory) {
@@ -147,10 +196,5 @@ export function updateInventory(updated: Inventory) {
     JSON.stringify(inventory)
   );
 
-  window.dispatchEvent(
-    new Event("inventoryUpdated")
-  );
+  window.dispatchEvent(new Event("inventoryUpdated"));
 }
-
-
-

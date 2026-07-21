@@ -58,7 +58,7 @@ const [menuOpen, setMenuOpen] = useState(false);
   return (
     <>{menuOpen && (
   <div
-    className="fixed inset-0 bg-black/10 z-30"
+    className="fixed inset-0 bg-transparent z-30"
     onClick={() => setMenuOpen(false)}
   />
 )}

@@ -10,9 +10,10 @@ import {
 
 export default function ExpensesPage() {
   const [date, setDate] = useState("");
-  const [category, setCategory] = useState("Flowers");
-  const [item, setItem] = useState("");
-  const [cost, setCost] = useState(0);
+  const [category, setCategory] = useState("Inventory");
+const [item, setItem] = useState("");
+const [quantity, setQuantity] = useState(1);
+const [cost, setCost] = useState(0);
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
@@ -26,19 +27,20 @@ export default function ExpensesPage() {
 
   function handleSave() {
     saveExpense({
-      id: Date.now(),
-      date,
-      category,
-      item,
-      cost,
-    });
+  id: Date.now(),
+  date,
+  category,
+  item,
+  quantity,
+  cost,
+});
 
     refreshExpenses();
 
     alert("✅ Expense Saved!");
-
+setQuantity(1);
     setDate("");
-    setCategory("Flowers");
+    setCategory("Inventory");
     setItem("");
     setCost(0);
   }
@@ -72,29 +74,32 @@ export default function ExpensesPage() {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            <option>Flowers</option>
-            <option>Wrapping</option>
-            <option>Ribbon</option>
-            <option>Supplies</option>
-            <option>Delivery</option>
-            <option>Others</option>
+            <option>Inventory</option>
+<option>Other</option>
           </select>
 
           <input
-            className="w-full border rounded-xl p-3"
-            placeholder="Item"
-            value={item}
-            onChange={(e) => setItem(e.target.value)}
-          />
+  className="w-full border rounded-xl p-3"
+  placeholder="Item"
+  value={item}
+  onChange={(e) => setItem(e.target.value)}
+/>
 
-          <input
-            type="number"
-            className="w-full border rounded-xl p-3"
-            placeholder="Cost"
-            value={cost}
-            onChange={(e) => setCost(Number(e.target.value))}
-          />
+<input
+  type="number"
+  className="w-full border rounded-xl p-3"
+  placeholder="Quantity"
+  value={quantity}
+  onChange={(e) => setQuantity(Number(e.target.value))}
+/>
 
+<input
+  type="number"
+  className="w-full border rounded-xl p-3"
+  placeholder="Cost"
+  value={cost}
+  onChange={(e) => setCost(Number(e.target.value))}
+/>
         </div>
 
         <button
