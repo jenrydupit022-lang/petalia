@@ -14,7 +14,7 @@ const handler = NextAuth({
       async authorize(credentials) {
         if (
           credentials?.email === "admin@petalia.com" &&
-          credentials?.password === "admin123"
+          credentials?.password === "hazelvillamer022"
         ) {
           return {
             id: "1",
