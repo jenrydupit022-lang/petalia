@@ -3,153 +3,437 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-export default function InventoryPage() {
-  const [items, setItems] =useState<any[]>([]);
+type Flower = {
+  id: number;
+  name: string;
+  stock: number;
+};
 
-  const [name, setName] = useState("");
-  const [qty, setQty] = useState(1);
+type EventStock = {
+  id: number;
+  name: string;
+  flowers: Flower[];
+};
+
+const STORAGE_KEY = "petalia_event_stock";
+
+export default function InventoryPage() {
+  const [events, setEvents] = useState<EventStock[]>([]);
+  const [selectedEvent, setSelectedEvent] =
+    useState<EventStock | null>(null);
+
+  const [eventName, setEventName] = useState("");
+  const [flowerName, setFlowerName] = useState("");
+  const [flowerStock, setFlowerStock] = useState("");
 
   useEffect(() => {
-    function loadInventory() {
-      const stored = JSON.parse(
-        localStorage.getItem("inventory") || "[]"
-      );
+    const saved = localStorage.getItem(STORAGE_KEY);
 
-      setItems(stored);
+    if (saved) {
+      setEvents(JSON.parse(saved));
     }
-
-    loadInventory();
-
-    window.addEventListener("storage", loadInventory);
-
-    return () => {
-      window.removeEventListener("storage", loadInventory);
-    };
   }, []);
 
-  function saveInventory(data: any[]) {
-    setItems(data);
-
+  function saveEvents(updatedEvents: EventStock[]) {
+    setEvents(updatedEvents);
     localStorage.setItem(
-      "inventory",
-      JSON.stringify(data)
-    );
-
-    window.dispatchEvent(
-      new Event("inventoryUpdated")
+      STORAGE_KEY,
+      JSON.stringify(updatedEvents)
     );
   }
 
-  function addItem() {
-    if (!name.trim()) return;
+  function addEvent() {
+    if (!eventName.trim()) {
+      alert("Please enter an event name.");
+      return;
+    }
 
-    const newItem = {
+    const newEvent: EventStock = {
       id: Date.now(),
-      item: name,
-      stock: qty,
+      name: eventName.trim(),
+      flowers: [],
     };
 
-    saveInventory([
-      ...items,
-      newItem,
-    ]);
-
-    setName("");
-    setQty(1);
+    saveEvents([...events, newEvent]);
+    setEventName("");
   }
 
-  function deleteItem(id: number) {
-    const updated = items.filter(
-      (item) => item.id !== id
+  function deleteEvent(eventId: number) {
+    if (!confirm("Delete this event?")) return;
+
+    saveEvents(
+      events.filter((event) => event.id !== eventId)
     );
 
-    saveInventory(updated);
+    setSelectedEvent(null);
+  }
+
+  function addFlower() {
+    if (!selectedEvent) return;
+
+    if (!flowerName.trim()) {
+      alert("Please enter a flower name.");
+      return;
+    }
+
+    const stock = Number(flowerStock);
+
+    if (!Number.isFinite(stock) || stock < 0) {
+      alert("Please enter a valid stock quantity.");
+      return;
+    }
+
+    const newFlower: Flower = {
+      id: Date.now(),
+      name: flowerName.trim(),
+      stock,
+    };
+
+    const updatedEvents = events.map((event) =>
+      event.id === selectedEvent.id
+        ? {
+            ...event,
+            flowers: [...event.flowers, newFlower],
+          }
+        : event
+    );
+
+    saveEvents(updatedEvents);
+
+    setSelectedEvent({
+      ...selectedEvent,
+      flowers: [...selectedEvent.flowers, newFlower],
+    });
+
+    setFlowerName("");
+    setFlowerStock("");
+  }
+
+  function editFlower(flower: Flower) {
+    if (!selectedEvent) return;
+
+    const newStock = prompt(
+      `Enter new stock for ${flower.name}:`,
+      String(flower.stock)
+    );
+
+    if (newStock === null) return;
+
+    const stock = Number(newStock);
+
+    if (!Number.isFinite(stock) || stock < 0) {
+      alert("Please enter a valid stock quantity.");
+      return;
+    }
+
+    const updatedFlowers = selectedEvent.flowers.map(
+      (item) =>
+        item.id === flower.id
+          ? { ...item, stock }
+          : item
+    );
+
+    const updatedEvents = events.map((event) =>
+      event.id === selectedEvent.id
+        ? {
+            ...event,
+            flowers: updatedFlowers,
+          }
+        : event
+    );
+
+    saveEvents(updatedEvents);
+
+    setSelectedEvent({
+      ...selectedEvent,
+      flowers: updatedFlowers,
+    });
+  }
+
+  function deleteFlower(flowerId: number) {
+    if (!selectedEvent) return;
+
+    if (!confirm("Delete this flower?")) return;
+
+    const updatedFlowers =
+      selectedEvent.flowers.filter(
+        (flower) => flower.id !== flowerId
+      );
+
+    const updatedEvents = events.map((event) =>
+      event.id === selectedEvent.id
+        ? {
+            ...event,
+            flowers: updatedFlowers,
+          }
+        : event
+    );
+
+    saveEvents(updatedEvents);
+
+    setSelectedEvent({
+      ...selectedEvent,
+      flowers: updatedFlowers,
+    });
+  }
+
+  function openEvent(event: EventStock) {
+    setSelectedEvent(event);
   }
 
   return (
-    <main className="min-h-screen bg-pink-50 p-8">
-      <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-8">
+    <main className="min-h-screen bg-pink-50 p-4 md:p-8">
+      <div className="max-w-5xl mx-auto">
 
-        <h1 className="text-4xl font-bold text-pink-600 mb-8">
-          📦 Material Inventory
-        </h1>
+        {/* HEADER */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
 
-        <div className="bg-pink-50 rounded-2xl p-6">
+          <div>
+            <h1 className="text-3xl md:text-5xl font-bold text-pink-600">
+              📦 Event Flower Stock
+            </h1>
 
-          <input
-            placeholder="Material Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full border rounded-xl p-3 mb-3"
-          />
+            <p className="text-gray-500 mt-2">
+              Manage flower stocks for each event.
+            </p>
+          </div>
 
-          <input
-            type="number"
-            placeholder="Quantity"
-            value={qty}
-            onChange={(e) => setQty(Number(e.target.value))}
-            className="w-full border rounded-xl p-3 mb-3"
-          />
-
-          <button
-            onClick={addItem}
-            className="bg-green-500 text-white px-5 py-3 rounded-xl"
+          <Link
+            href="/petalia"
+            className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-3 rounded-xl font-semibold text-center"
           >
-            ➕ Add Stock
-          </button>
+            ← Back to Petalia
+          </Link>
 
         </div>
 
-        <div className="mt-8">
+        {/* EVENT LIST */}
+        {!selectedEvent && (
+          <div className="space-y-6">
 
-          <h2 className="text-2xl font-bold mb-4">
-            📋 Stock List
-          </h2>
+            <div className="bg-white rounded-3xl shadow-md p-6 border border-pink-100">
 
-          {items.map((item) => (
+              <h2 className="text-xl font-bold text-gray-700 mb-4">
+                ➕ Add Event
+              </h2>
 
-            <div
-              key={item.id}
-              className="bg-white border rounded-xl p-4 mb-3 flex justify-between items-center"
-            >
+              <div className="flex flex-col md:flex-row gap-3">
 
-              <div>
+                <input
+                  type="text"
+                  value={eventName}
+                  onChange={(e) =>
+                    setEventName(e.target.value)
+                  }
+                  placeholder="Example: Teacher's Day 2026"
+                  className="flex-1 border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300"
+                />
 
-                <h3 className="font-bold text-lg">
-                  {item.item}
-                </h3>
-
-                <p>
-                  Quantity: {item.stock}
-                </p>
-
-                {item.stock <= 5 && (
-                  <p className="text-red-500 font-bold">
-                    ⚠️ Low Stock
-                  </p>
-                )}
+                <button
+                  onClick={addEvent}
+                  className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-xl font-semibold"
+                >
+                  + Add Event
+                </button>
 
               </div>
 
-              <button
-                onClick={() => deleteItem(item.id)}
-                className="bg-red-500 text-white px-4 py-2 rounded-xl"
-              >
-                🗑 Delete
-              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+              {events.map((event) => (
+                <div
+                  key={event.id}
+                  className="bg-white rounded-3xl shadow-md p-6 border border-pink-100"
+                >
+
+                  <div className="flex items-start justify-between gap-4">
+
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-700">
+                        🌸 {event.name}
+                      </h2>
+
+                      <p className="text-gray-500 mt-2">
+                        {event.flowers.length} flower type
+                        {event.flowers.length !== 1
+                          ? "s"
+                          : ""}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() =>
+                        deleteEvent(event.id)
+                      }
+                      className="text-red-500 hover:text-red-700 font-semibold"
+                    >
+                      Delete
+                    </button>
+
+                  </div>
+
+                  <button
+                    onClick={() => openEvent(event)}
+                    className="w-full mt-5 bg-pink-500 hover:bg-pink-600 text-white py-3 rounded-xl font-semibold"
+                  >
+                    Open Event
+                  </button>
+
+                </div>
+              ))}
 
             </div>
 
-          ))}
+            {events.length === 0 && (
+              <div className="bg-white rounded-3xl shadow-md p-10 text-center">
+                <div className="text-5xl mb-3">
+                  📦
+                </div>
 
-        </div>
+                <p className="text-gray-500">
+                  No events yet. Add your first event above.
+                </p>
+              </div>
+            )}
 
-        <Link
-          href="/petalia/bouquets"
-          className="inline-block mt-8 bg-gray-500 text-white px-6 py-3 rounded-xl"
-        >
-          ← Back
-        </Link>
+          </div>
+        )}
+
+        {/* SELECTED EVENT */}
+        {selectedEvent && (
+          <div>
+
+            <button
+              onClick={() => setSelectedEvent(null)}
+              className="mb-5 text-pink-600 font-semibold hover:underline"
+            >
+              ← Back to Events
+            </button>
+
+            <div className="bg-white rounded-3xl shadow-md p-6 border border-pink-100 mb-6">
+
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-700">
+                🌸 {selectedEvent.name}
+              </h2>
+
+              <p className="text-gray-500 mt-1">
+                Flower stock
+              </p>
+
+            </div>
+
+            {/* ADD FLOWER */}
+            <div className="bg-white rounded-3xl shadow-md p-6 border border-pink-100 mb-6">
+
+              <h2 className="text-xl font-bold text-gray-700 mb-4">
+                ➕ Add Flower
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+                <input
+                  type="text"
+                  value={flowerName}
+                  onChange={(e) =>
+                    setFlowerName(e.target.value)
+                  }
+                  placeholder="Flower name"
+                  className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300"
+                />
+
+                <input
+                  type="number"
+                  min="0"
+                  value={flowerStock}
+                  onChange={(e) =>
+                    setFlowerStock(e.target.value)
+                  }
+                  placeholder="Stock quantity"
+                  className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300"
+                />
+
+                <button
+                  onClick={addFlower}
+                  className="bg-pink-500 hover:bg-pink-600 text-white rounded-xl px-5 py-3 font-semibold"
+                >
+                  + Add Flower
+                </button>
+
+              </div>
+
+            </div>
+
+            {/* FLOWER STOCK */}
+            <div className="bg-white rounded-3xl shadow-md border border-pink-100 overflow-hidden">
+
+              <div className="p-6 border-b border-gray-100">
+                <h2 className="text-xl font-bold text-gray-700">
+                  🌷 Current Stock
+                </h2>
+              </div>
+
+              {selectedEvent.flowers.length === 0 ? (
+                <div className="p-10 text-center text-gray-500">
+                  No flowers added yet.
+                </div>
+              ) : (
+                <div className="divide-y">
+
+                  {selectedEvent.flowers.map(
+                    (flower) => (
+                      <div
+                        key={flower.id}
+                        className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                      >
+
+                        <div>
+                          <p className="text-lg font-bold text-gray-700">
+                            🌸 {flower.name}
+                          </p>
+
+                          <p className="text-gray-500">
+                            Stock:{" "}
+                            <span className="font-bold text-pink-600">
+                              {flower.stock}
+                            </span>
+                          </p>
+                        </div>
+
+                        <div className="flex gap-2">
+
+                          <button
+                            onClick={() =>
+                              editFlower(flower)
+                            }
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold"
+                          >
+                            Edit Stock
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              deleteFlower(flower.id)
+                            }
+                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold"
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+
+                      </div>
+                    )
+                  )}
+
+                </div>
+              )}
+
+            </div>
+
+          </div>
+        )}
 
       </div>
     </main>

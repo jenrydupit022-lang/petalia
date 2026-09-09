@@ -152,7 +152,17 @@ className={`block p-2 md:p-3 rounded-xl ${
 >
   💸 Expenses
 </Link>
-
+<Link
+  href="/petalia/materials"
+  onClick={() => setMenuOpen(false)}
+  className={`block p-2 md:p-3 rounded-xl ${
+    pathname === "/petalia/materials"
+      ? "bg-pink-200 text-pink-700"
+      : "hover:bg-pink-100"
+  }`}
+>
+  🧰 Materials Inventory
+</Link>
       <Link
   href="/petalia/inventory"
   onClick={() => setMenuOpen(false)}
@@ -162,7 +172,7 @@ className={`block p-2 md:p-3 rounded-xl flex justify-between items-center ${
     : "hover:bg-pink-100"
 }`}
 >
-  <span>📦 Inventory</span>
+  <span>📦 Event Inventory</span>
 
   {lowStockCount > 0 && (
     <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
