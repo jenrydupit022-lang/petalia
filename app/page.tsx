@@ -82,6 +82,7 @@ export default function Home() {
 
             <div>
               <h1 className="text-3xl md:text-5xl font-bold text-pink-500">
+                
                 🌸 The Studio Petalia
               </h1>
 

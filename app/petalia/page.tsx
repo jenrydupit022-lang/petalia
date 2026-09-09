@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { getSales, Sale } from "@/lib/storage";
 import Sidebar from "@/components/Sidebar";
@@ -86,7 +87,7 @@ export default function PetaliaPage() {
 
   /* =========================
      LOAD PETALIA DATA
-     ========================= */
+  ========================= */
 
   useEffect(() => {
     if (!allowed) return;
@@ -112,7 +113,7 @@ export default function PetaliaPage() {
 
   /* =========================
      LOADING
-     ========================= */
+  ========================= */
 
   if (checkingAccess) {
     return (
@@ -134,7 +135,7 @@ export default function PetaliaPage() {
 
   /* =========================
      CALCULATIONS
-     ========================= */
+  ========================= */
 
   const totalSales = sales.reduce(
     (sum, sale) => sum + sale.total,
@@ -218,15 +219,30 @@ export default function PetaliaPage() {
             </p>
           </div>
 
-          <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              router.replace("/login");
-            }}
-            className="w-full md:w-auto bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl font-semibold"
-          >
-            🚪 Logout
-          </button>
+          <div className="flex flex-col md:flex-row gap-3">
+
+            {/* BACK TO BUSINESS SELECTION */}
+
+            <Link
+              href="/"
+              className="w-full md:w-auto bg-gray-700 hover:bg-gray-800 text-white px-5 py-3 rounded-xl font-semibold text-center"
+            >
+              ← Back to Business Selection
+            </Link>
+
+            {/* LOGOUT */}
+
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                router.replace("/login");
+              }}
+              className="w-full md:w-auto bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl font-semibold"
+            >
+              🚪 Logout
+            </button>
+
+          </div>
 
         </div>
 
