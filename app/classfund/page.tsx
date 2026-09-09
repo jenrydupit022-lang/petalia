@@ -30,6 +30,10 @@ export default function ClassFundPage() {
   const [pendingEditRequests, setPendingEditRequests] =
     useState(0);
 
+  /* PRINT */
+
+  const [printDate, setPrintDate] = useState("");
+
   /* EDIT REQUEST MODAL */
 
   const [requestingId, setRequestingId] =
@@ -443,15 +447,32 @@ export default function ClassFundPage() {
   }
 
   /* ================================
+     PRINT REPORT
+  ================================= */
+
+  function printReport() {
+    const now = new Date();
+
+    setPrintDate(
+      now.toLocaleString("en-PH", {
+        dateStyle: "long",
+        timeStyle: "short",
+      })
+    );
+
+    setTimeout(() => {
+      window.print();
+    }, 100);
+  }
+
+  /* ================================
      LOADING
   ================================= */
 
   if (loading) {
     return (
       <main className="min-h-screen bg-pink-50 flex items-center justify-center p-6">
-
         <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
-
           <div className="text-4xl mb-3">
             💰
           </div>
@@ -459,9 +480,7 @@ export default function ClassFundPage() {
           <p className="text-gray-600">
             Loading ClassFund...
           </p>
-
         </div>
-
       </main>
     );
   }
@@ -473,707 +492,978 @@ export default function ClassFundPage() {
   return (
     <main className="min-h-screen bg-pink-50 p-4 sm:p-6 md:p-10">
 
-      <div className="max-w-7xl mx-auto">
+      {/* ================================
+          NORMAL WEBSITE CONTENT
+      ================================= */}
 
-        {/* HEADER */}
+      <div className="print:hidden">
+        <div className="max-w-7xl mx-auto">
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+          {/* HEADER */}
 
-          <div>
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-pink-600">
-              💰 ClassFund
-            </h1>
-
-            <p className="mt-2 text-gray-600">
-              Class Treasurer Financial Record
-            </p>
-
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-
-            {/* TREASURER NOTIFICATION */}
-
-            {role === "treasurer" &&
-              pendingEditRequests > 0 && (
-
-                <Link
-                  href="/classfund/edit-requests"
-                  className="bg-red-50 border border-red-200 shadow px-4 py-3 rounded-xl text-center hover:bg-red-100 transition cursor-pointer"
-                >
-
-                  <span className="text-xs text-red-500 block">
-                    🔔 Pending Edit Requests
-                  </span>
-
-                  <span className="font-bold text-red-600">
-                    {pendingEditRequests}
-                  </span>
-
-                </Link>
-
-              )}
-
-            {/* ACCESS */}
-
-            <div className="bg-white shadow px-4 py-3 rounded-xl text-center">
-
-              <span className="text-xs text-gray-500 block">
-                Access
-              </span>
-
-              <span className="font-bold text-pink-600 capitalize">
-                {role}
-              </span>
-
-            </div>
-
-            {/* BACK */}
-
-            <Link
-              href="/"
-              className="bg-gray-600 hover:bg-gray-700 text-white px-5 py-3 rounded-xl text-center"
-            >
-              ← Back
-            </Link>
-
-          </div>
-
-        </div>
-
-        {/* SUMMARY */}
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
-
-          {/* CASH IN */}
-
-          <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-6 border border-green-100">
-
-            <p className="text-gray-500 font-medium">
-              💰 Total Cash In
-            </p>
-
-            <h2 className="text-2xl sm:text-3xl font-bold text-green-600 mt-2">
-              {formatMoney(totalCashIn)}
-            </h2>
-
-          </div>
-
-          {/* CASH OUT */}
-
-          <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-6 border border-red-100">
-
-            <p className="text-gray-500 font-medium">
-              💸 Total Cash Out
-            </p>
-
-            <h2 className="text-2xl sm:text-3xl font-bold text-red-500 mt-2">
-              {formatMoney(totalCashOut)}
-            </h2>
-
-          </div>
-
-          {/* BALANCE */}
-
-          <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-6 border border-pink-100">
-
-            <p className="text-gray-500 font-medium">
-              💵 Fund Balance
-            </p>
-
-            <h2
-              className={`text-2xl sm:text-3xl font-bold mt-2 ${
-                fundBalance >= 0
-                  ? "text-pink-600"
-                  : "text-red-600"
-              }`}
-            >
-              {formatMoney(fundBalance)}
-            </h2>
-
-          </div>
-
-        </div>
-
-        {/* TREASURER ADD */}
-
-        {role === "treasurer" && (
-
-          <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-6 md:p-8 mb-8">
-
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">
-              ➕ Add Transaction
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-              {/* DATE */}
-
-              <div>
-
-                <label className="block text-sm font-semibold text-gray-600 mb-2">
-                  Date
-                </label>
-
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) =>
-                    setDate(e.target.value)
-                  }
-                  className="w-full border border-gray-300 rounded-xl p-3 min-h-[48px]"
-                />
-
-              </div>
-
-              {/* PARTICULARS */}
-
-              <div>
-
-                <label className="block text-sm font-semibold text-gray-600 mb-2">
-                  Particulars
-                </label>
-
-                <input
-                  type="text"
-                  placeholder="Example: MST 2A Pending Payments"
-                  value={particulars}
-                  onChange={(e) =>
-                    setParticulars(e.target.value)
-                  }
-                  className="w-full border border-gray-300 rounded-xl p-3 min-h-[48px]"
-                />
-
-              </div>
-
-              {/* CASH IN */}
-
-              <div>
-
-                <label className="block text-sm font-semibold text-green-600 mb-2">
-                  💰 Cash In
-                </label>
-
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={cashIn}
-                  onChange={(e) => {
-                    setCashIn(e.target.value);
-
-                    if (e.target.value) {
-                      setCashOut("");
-                    }
-                  }}
-                  className="w-full border border-green-200 rounded-xl p-3 min-h-[48px]"
-                />
-
-              </div>
-
-              {/* CASH OUT */}
-
-              <div>
-
-                <label className="block text-sm font-semibold text-red-500 mb-2">
-                  💸 Cash Out
-                </label>
-
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={cashOut}
-                  onChange={(e) => {
-                    setCashOut(e.target.value);
-
-                    if (e.target.value) {
-                      setCashIn("");
-                    }
-                  }}
-                  className="w-full border border-red-200 rounded-xl p-3 min-h-[48px]"
-                />
-
-              </div>
-
-            </div>
-
-            <button
-              onClick={addTransaction}
-              disabled={saving}
-              className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-pink-300 text-white font-bold rounded-xl py-4 mt-6 min-h-[52px]"
-            >
-              {saving
-                ? "Saving..."
-                : "➕ Add Transaction"}
-            </button>
-
-          </div>
-
-        )}
-
-        {/* AUDITOR */}
-
-        {role === "auditor" && (
-
-          <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-6 mb-8 border border-blue-100">
-
-            <h2 className="text-xl font-bold text-gray-800">
-              🧾 Auditor Access
-            </h2>
-
-            <p className="text-gray-600 mt-2">
-              You can review all ClassFund records.
-              If a transaction has an error, use{" "}
-              <b>Request Edit</b>. The Treasurer must
-              approve the request before changes can
-              be made.
-            </p>
-
-          </div>
-
-        )}
-
-        {/* VIEWER */}
-
-        {role === "viewer" && (
-
-          <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-6 mb-8 border border-gray-100">
-
-            <h2 className="text-xl font-bold text-gray-800">
-              👀 View-Only Access
-            </h2>
-
-            <p className="text-gray-600 mt-2">
-              You can view the ClassFund financial
-              records but cannot modify them.
-            </p>
-
-          </div>
-
-        )}
-
-        {/* TRANSACTIONS */}
-
-        <div className="bg-white rounded-3xl shadow-xl p-4 sm:p-6 md:p-8">
-
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
 
             <div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-pink-600">
+                💰 ClassFund
+              </h1>
 
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
-                📋 Fund Transactions
+              <p className="mt-2 text-gray-600">
+                Class Treasurer Financial Record
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+
+              {/* TREASURER NOTIFICATION */}
+
+              {role === "treasurer" &&
+                pendingEditRequests > 0 && (
+
+                  <Link
+                    href="/classfund/edit-requests"
+                    className="bg-red-50 border border-red-200 shadow px-4 py-3 rounded-xl text-center hover:bg-red-100 transition cursor-pointer"
+                  >
+                    <span className="text-xs text-red-500 block">
+                      🔔 Pending Edit Requests
+                    </span>
+
+                    <span className="font-bold text-red-600">
+                      {pendingEditRequests}
+                    </span>
+                  </Link>
+
+                )}
+
+              {/* ACCESS */}
+
+              <div className="bg-white shadow px-4 py-3 rounded-xl text-center">
+                <span className="text-xs text-gray-500 block">
+                  Access
+                </span>
+
+                <span className="font-bold text-pink-600 capitalize">
+                  {role}
+                </span>
+              </div>
+
+              {/* PRINT */}
+
+              <button
+                onClick={printReport}
+                className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-3 rounded-xl text-center font-semibold shadow"
+              >
+                🖨️ Print Report
+              </button>
+
+              {/* BACK */}
+
+              <Link
+                href="/"
+                className="bg-gray-600 hover:bg-gray-700 text-white px-5 py-3 rounded-xl text-center"
+              >
+                ← Back
+              </Link>
+
+            </div>
+
+          </div>
+
+          {/* SUMMARY */}
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
+
+            {/* CASH IN */}
+
+            <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-6 border border-green-100">
+              <p className="text-gray-500 font-medium">
+                💰 Total Cash In
+              </p>
+
+              <h2 className="text-2xl sm:text-3xl font-bold text-green-600 mt-2">
+                {formatMoney(totalCashIn)}
+              </h2>
+            </div>
+
+            {/* CASH OUT */}
+
+            <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-6 border border-red-100">
+              <p className="text-gray-500 font-medium">
+                💸 Total Cash Out
+              </p>
+
+              <h2 className="text-2xl sm:text-3xl font-bold text-red-500 mt-2">
+                {formatMoney(totalCashOut)}
+              </h2>
+            </div>
+
+            {/* BALANCE */}
+
+            <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-6 border border-pink-100">
+              <p className="text-gray-500 font-medium">
+                💵 Fund Balance
+              </p>
+
+              <h2
+                className={`text-2xl sm:text-3xl font-bold mt-2 ${
+                  fundBalance >= 0
+                    ? "text-pink-600"
+                    : "text-red-600"
+                }`}
+              >
+                {formatMoney(fundBalance)}
+              </h2>
+            </div>
+
+          </div>
+
+          {/* TREASURER ADD */}
+
+          {role === "treasurer" && (
+
+            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-6 md:p-8 mb-8">
+
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">
+                ➕ Add Transaction
               </h2>
 
-              <p className="text-sm text-gray-500 mt-1">
-                Complete record of cash movement
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                {/* DATE */}
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-2">
+                    Date
+                  </label>
+
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) =>
+                      setDate(e.target.value)
+                    }
+                    className="w-full border border-gray-300 rounded-xl p-3 min-h-[48px]"
+                  />
+                </div>
+
+                {/* PARTICULARS */}
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-2">
+                    Particulars
+                  </label>
+
+                  <input
+                    type="text"
+                    placeholder="Example: MST 2A Pending Payments"
+                    value={particulars}
+                    onChange={(e) =>
+                      setParticulars(e.target.value)
+                    }
+                    className="w-full border border-gray-300 rounded-xl p-3 min-h-[48px]"
+                  />
+                </div>
+
+                {/* CASH IN */}
+
+                <div>
+                  <label className="block text-sm font-semibold text-green-600 mb-2">
+                    💰 Cash In
+                  </label>
+
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={cashIn}
+                    onChange={(e) => {
+                      setCashIn(e.target.value);
+
+                      if (e.target.value) {
+                        setCashOut("");
+                      }
+                    }}
+                    className="w-full border border-green-200 rounded-xl p-3 min-h-[48px]"
+                  />
+                </div>
+
+                {/* CASH OUT */}
+
+                <div>
+                  <label className="block text-sm font-semibold text-red-500 mb-2">
+                    💸 Cash Out
+                  </label>
+
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={cashOut}
+                    onChange={(e) => {
+                      setCashOut(e.target.value);
+
+                      if (e.target.value) {
+                        setCashIn("");
+                      }
+                    }}
+                    className="w-full border border-red-200 rounded-xl p-3 min-h-[48px]"
+                  />
+                </div>
+
+              </div>
+
+              <button
+                onClick={addTransaction}
+                disabled={saving}
+                className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-pink-300 text-white font-bold rounded-xl py-4 mt-6 min-h-[52px]"
+              >
+                {saving
+                  ? "Saving..."
+                  : "➕ Add Transaction"}
+              </button>
+
+            </div>
+
+          )}
+
+          {/* AUDITOR */}
+
+          {role === "auditor" && (
+
+            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-6 mb-8 border border-blue-100">
+
+              <h2 className="text-xl font-bold text-gray-800">
+                🧾 Auditor Access
+              </h2>
+
+              <p className="text-gray-600 mt-2">
+                You can review all ClassFund records.
+                If a transaction has an error, use{" "}
+                <b>Request Edit</b>. The Treasurer must
+                approve the request before changes can
+                be made.
               </p>
 
             </div>
 
-            <div className="bg-pink-50 px-4 py-2 rounded-xl text-sm text-gray-600 w-fit">
-              {transactions.length} transaction
-              {transactions.length !== 1
-                ? "s"
-                : ""}
+          )}
+
+          {/* VIEWER */}
+
+          {role === "viewer" && (
+
+            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-6 mb-8 border border-gray-100">
+
+              <h2 className="text-xl font-bold text-gray-800">
+                👀 View-Only Access
+              </h2>
+
+              <p className="text-gray-600 mt-2">
+                You can view the ClassFund financial
+                records but cannot modify them.
+              </p>
+
             </div>
 
-          </div>
+          )}
 
-          {/* DESKTOP TABLE */}
+          {/* TRANSACTIONS */}
 
-          <div className="hidden md:block overflow-x-auto">
+          <div className="bg-white rounded-3xl shadow-xl p-4 sm:p-6 md:p-8">
 
-            <table className="w-full border-collapse">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
 
-              <thead>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+                  📋 Fund Transactions
+                </h2>
 
-                <tr className="bg-pink-100 border-b border-pink-200">
+                <p className="text-sm text-gray-500 mt-1">
+                  Complete record of cash movement
+                </p>
+              </div>
 
-                  <th className="p-4 text-left">
-                    DATE
-                  </th>
+              <div className="bg-pink-50 px-4 py-2 rounded-xl text-sm text-gray-600 w-fit">
+                {transactions.length} transaction
+                {transactions.length !== 1
+                  ? "s"
+                  : ""}
+              </div>
 
-                  <th className="p-4 text-left">
-                    PARTICULARS
-                  </th>
+            </div>
 
-                  <th className="p-4 text-right">
-                    CASH IN
-                  </th>
+            {/* DESKTOP TABLE */}
 
-                  <th className="p-4 text-right">
-                    CASH OUT
-                  </th>
+            <div className="hidden md:block overflow-x-auto">
 
-                  <th className="p-4 text-right">
-                    FUND BALANCE
-                  </th>
+              <table className="w-full border-collapse">
 
-                  {role !== "viewer" && (
-                    <th className="p-4 text-center">
-                      ACTION
+                <thead>
+
+                  <tr className="bg-pink-100 border-b border-pink-200">
+
+                    <th className="p-4 text-left">
+                      DATE
                     </th>
-                  )}
 
-                </tr>
+                    <th className="p-4 text-left">
+                      PARTICULARS
+                    </th>
 
-              </thead>
+                    <th className="p-4 text-right">
+                      CASH IN
+                    </th>
 
-              <tbody>
+                    <th className="p-4 text-right">
+                      CASH OUT
+                    </th>
 
-                {transactions.length === 0 ? (
-
-                  <tr>
-
-                    <td
-                      colSpan={
-                        role !== "viewer"
-                          ? 6
-                          : 5
-                      }
-                      className="p-10 text-center text-gray-500"
-                    >
-                      No transactions yet.
-                    </td>
-
-                  </tr>
-
-                ) : (
-
-                  transactions.map(
-                    (transaction, index) => {
-
-                      const balance =
-                        getBalance(index);
-
-                      return (
-
-                        <tr
-                          key={transaction.id}
-                          className="border-b border-gray-200 hover:bg-pink-50"
-                        >
-
-                          <td className="p-4 whitespace-nowrap">
-                            {transaction.date}
-                          </td>
-
-                          <td className="p-4 min-w-[250px]">
-                            <span className="font-medium">
-                              {transaction.particulars}
-                            </span>
-                          </td>
-
-                          <td className="p-4 text-right text-green-600 font-semibold">
-                            {transaction.cashIn > 0
-                              ? formatMoney(
-                                  transaction.cashIn
-                                )
-                              : "—"}
-                          </td>
-
-                          <td className="p-4 text-right text-red-500 font-semibold">
-                            {transaction.cashOut > 0
-                              ? formatMoney(
-                                  transaction.cashOut
-                                )
-                              : "—"}
-                          </td>
-
-                          <td className="p-4 text-right font-bold">
-                            {formatMoney(balance)}
-                          </td>
-
-                          <td className="p-4 text-center">
-
-                            {role === "treasurer" && (
-
-                              <button
-                                onClick={() =>
-                                  deleteTransaction(
-                                    transaction.id
-                                  )
-                                }
-                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg"
-                              >
-                                Delete
-                              </button>
-
-                            )}
-
-                            {role === "auditor" && (
-
-                              <button
-                                onClick={() => {
-                                  setRequestingId(
-                                    transaction.id
-                                  );
-
-                                  setRequestReason("");
-                                }}
-                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg"
-                              >
-                                Request Edit
-                              </button>
-
-                            )}
-
-                          </td>
-
-                        </tr>
-
-                      );
-                    }
-                  )
-
-                )}
-
-              </tbody>
-
-              {/* TOTAL */}
-
-              {transactions.length > 0 && (
-
-                <tfoot>
-
-                  <tr className="bg-gray-50 border-t-2 border-gray-300">
-
-                    <td
-                      colSpan={2}
-                      className="p-4 font-bold text-right"
-                    >
-                      TOTAL
-                    </td>
-
-                    <td className="p-4 text-right font-bold text-green-600">
-                      {formatMoney(totalCashIn)}
-                    </td>
-
-                    <td className="p-4 text-right font-bold text-red-500">
-                      {formatMoney(totalCashOut)}
-                    </td>
-
-                    <td className="p-4 text-right font-bold text-pink-600">
-                      {formatMoney(fundBalance)}
-                    </td>
+                    <th className="p-4 text-right">
+                      FUND BALANCE
+                    </th>
 
                     {role !== "viewer" && (
-                      <td></td>
+                      <th className="p-4 text-center">
+                        ACTION
+                      </th>
                     )}
 
                   </tr>
 
-                </tfoot>
+                </thead>
+
+                <tbody>
+
+                  {transactions.length === 0 ? (
+
+                    <tr>
+
+                      <td
+                        colSpan={
+                          role !== "viewer"
+                            ? 6
+                            : 5
+                        }
+                        className="p-10 text-center text-gray-500"
+                      >
+                        No transactions yet.
+                      </td>
+
+                    </tr>
+
+                  ) : (
+
+                    transactions.map(
+                      (transaction, index) => {
+
+                        const balance =
+                          getBalance(index);
+
+                        return (
+
+                          <tr
+                            key={transaction.id}
+                            className="border-b border-gray-200 hover:bg-pink-50"
+                          >
+
+                            <td className="p-4 whitespace-nowrap">
+                              {transaction.date}
+                            </td>
+
+                            <td className="p-4 min-w-[250px]">
+                              <span className="font-medium">
+                                {transaction.particulars}
+                              </span>
+                            </td>
+
+                            <td className="p-4 text-right text-green-600 font-semibold">
+                              {transaction.cashIn > 0
+                                ? formatMoney(
+                                    transaction.cashIn
+                                  )
+                                : "—"}
+                            </td>
+
+                            <td className="p-4 text-right text-red-500 font-semibold">
+                              {transaction.cashOut > 0
+                                ? formatMoney(
+                                    transaction.cashOut
+                                  )
+                                : "—"}
+                            </td>
+
+                            <td className="p-4 text-right font-bold">
+                              {formatMoney(balance)}
+                            </td>
+
+                            <td className="p-4 text-center">
+
+                              {role === "treasurer" && (
+
+                                <button
+                                  onClick={() =>
+                                    deleteTransaction(
+                                      transaction.id
+                                    )
+                                  }
+                                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg"
+                                >
+                                  Delete
+                                </button>
+
+                              )}
+
+                              {role === "auditor" && (
+
+                                <button
+                                  onClick={() => {
+                                    setRequestingId(
+                                      transaction.id
+                                    );
+
+                                    setRequestReason("");
+                                  }}
+                                  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg"
+                                >
+                                  Request Edit
+                                </button>
+
+                              )}
+
+                            </td>
+
+                          </tr>
+
+                        );
+                      }
+                    )
+
+                  )}
+
+                </tbody>
+
+                {/* TOTAL */}
+
+                {transactions.length > 0 && (
+
+                  <tfoot>
+
+                    <tr className="bg-gray-50 border-t-2 border-gray-300">
+
+                      <td
+                        colSpan={2}
+                        className="p-4 font-bold text-right"
+                      >
+                        TOTAL
+                      </td>
+
+                      <td className="p-4 text-right font-bold text-green-600">
+                        {formatMoney(totalCashIn)}
+                      </td>
+
+                      <td className="p-4 text-right font-bold text-red-500">
+                        {formatMoney(totalCashOut)}
+                      </td>
+
+                      <td className="p-4 text-right font-bold text-pink-600">
+                        {formatMoney(fundBalance)}
+                      </td>
+
+                      {role !== "viewer" && (
+                        <td></td>
+                      )}
+
+                    </tr>
+
+                  </tfoot>
+
+                )}
+
+              </table>
+
+            </div>
+
+            {/* MOBILE */}
+
+            <div className="md:hidden space-y-4">
+
+              {transactions.length === 0 ? (
+
+                <div className="p-8 text-center text-gray-500 border rounded-2xl">
+                  No transactions yet.
+                </div>
+
+              ) : (
+
+                transactions.map(
+                  (transaction, index) => {
+
+                    const balance =
+                      getBalance(index);
+
+                    return (
+
+                      <div
+                        key={transaction.id}
+                        className="border border-gray-200 rounded-2xl p-4 shadow-sm"
+                      >
+
+                        <div className="flex justify-between items-start gap-3 mb-3">
+
+                          <div>
+                            <p className="text-xs text-gray-500">
+                              DATE
+                            </p>
+
+                            <p className="font-semibold">
+                              {transaction.date}
+                            </p>
+                          </div>
+
+                          <div className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                            {formatMoney(balance)}
+                          </div>
+
+                        </div>
+
+                        <div className="mb-4">
+
+                          <p className="text-xs text-gray-500 mb-1">
+                            PARTICULARS
+                          </p>
+
+                          <p className="font-medium break-words">
+                            {transaction.particulars}
+                          </p>
+
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+
+                          <div className="bg-green-50 rounded-xl p-3">
+
+                            <p className="text-xs text-green-700">
+                              CASH IN
+                            </p>
+
+                            <p className="font-bold text-green-600 mt-1">
+                              {transaction.cashIn > 0
+                                ? formatMoney(
+                                    transaction.cashIn
+                                  )
+                                : "—"}
+                            </p>
+
+                          </div>
+
+                          <div className="bg-red-50 rounded-xl p-3">
+
+                            <p className="text-xs text-red-700">
+                              CASH OUT
+                            </p>
+
+                            <p className="font-bold text-red-500 mt-1">
+                              {transaction.cashOut > 0
+                                ? formatMoney(
+                                    transaction.cashOut
+                                  )
+                                : "—"}
+                            </p>
+
+                          </div>
+
+                        </div>
+
+                        {role === "treasurer" && (
+
+                          <button
+                            onClick={() =>
+                              deleteTransaction(
+                                transaction.id
+                              )
+                            }
+                            className="w-full bg-red-500 text-white py-3 rounded-xl mt-4 font-semibold"
+                          >
+                            Delete Transaction
+                          </button>
+
+                        )}
+
+                        {role === "auditor" && (
+
+                          <button
+                            onClick={() => {
+                              setRequestingId(
+                                transaction.id
+                              );
+
+                              setRequestReason("");
+                            }}
+                            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl mt-4 font-semibold"
+                          >
+                            📝 Request Edit
+                          </button>
+
+                        )}
+
+                      </div>
+
+                    );
+                  }
+                )
 
               )}
 
-            </table>
+              {/* MOBILE TOTAL */}
 
-          </div>
+              {transactions.length > 0 && (
 
-          {/* MOBILE */}
+                <div className="bg-pink-50 rounded-2xl p-5 border border-pink-100">
 
-          <div className="md:hidden space-y-4">
+                  <p className="font-bold text-gray-700 mb-4">
+                    TOTAL
+                  </p>
 
-            {transactions.length === 0 ? (
+                  <div className="space-y-3">
 
-              <div className="p-8 text-center text-gray-500 border rounded-2xl">
-                No transactions yet.
-              </div>
+                    <div className="flex justify-between gap-3">
 
-            ) : (
+                      <span className="text-gray-600">
+                        Total Cash In
+                      </span>
 
-              transactions.map(
-                (transaction, index) => {
-
-                  const balance =
-                    getBalance(index);
-
-                  return (
-
-                    <div
-                      key={transaction.id}
-                      className="border border-gray-200 rounded-2xl p-4 shadow-sm"
-                    >
-
-                      <div className="flex justify-between items-start gap-3 mb-3">
-
-                        <div>
-
-                          <p className="text-xs text-gray-500">
-                            DATE
-                          </p>
-
-                          <p className="font-semibold">
-                            {transaction.date}
-                          </p>
-
-                        </div>
-
-                        <div className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
-                          {formatMoney(balance)}
-                        </div>
-
-                      </div>
-
-                      <div className="mb-4">
-
-                        <p className="text-xs text-gray-500 mb-1">
-                          PARTICULARS
-                        </p>
-
-                        <p className="font-medium break-words">
-                          {transaction.particulars}
-                        </p>
-
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-
-                        <div className="bg-green-50 rounded-xl p-3">
-
-                          <p className="text-xs text-green-700">
-                            CASH IN
-                          </p>
-
-                          <p className="font-bold text-green-600 mt-1">
-                            {transaction.cashIn > 0
-                              ? formatMoney(
-                                  transaction.cashIn
-                                )
-                              : "—"}
-                          </p>
-
-                        </div>
-
-                        <div className="bg-red-50 rounded-xl p-3">
-
-                          <p className="text-xs text-red-700">
-                            CASH OUT
-                          </p>
-
-                          <p className="font-bold text-red-500 mt-1">
-                            {transaction.cashOut > 0
-                              ? formatMoney(
-                                  transaction.cashOut
-                                )
-                              : "—"}
-                          </p>
-
-                        </div>
-
-                      </div>
-
-                      {role === "treasurer" && (
-
-                        <button
-                          onClick={() =>
-                            deleteTransaction(
-                              transaction.id
-                            )
-                          }
-                          className="w-full bg-red-500 text-white py-3 rounded-xl mt-4 font-semibold"
-                        >
-                          Delete Transaction
-                        </button>
-
-                      )}
-
-                      {role === "auditor" && (
-
-                        <button
-                          onClick={() => {
-                            setRequestingId(
-                              transaction.id
-                            );
-
-                            setRequestReason("");
-                          }}
-                          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl mt-4 font-semibold"
-                        >
-                          📝 Request Edit
-                        </button>
-
-                      )}
+                      <span className="font-bold text-green-600">
+                        {formatMoney(totalCashIn)}
+                      </span>
 
                     </div>
 
-                  );
-                }
-              )
+                    <div className="flex justify-between gap-3">
 
-            )}
+                      <span className="text-gray-600">
+                        Total Cash Out
+                      </span>
 
-            {/* MOBILE TOTAL */}
+                      <span className="font-bold text-red-500">
+                        {formatMoney(totalCashOut)}
+                      </span>
 
-            {transactions.length > 0 && (
+                    </div>
 
-              <div className="bg-pink-50 rounded-2xl p-5 border border-pink-100">
+                    <div className="border-t pt-3 flex justify-between gap-3">
 
-                <p className="font-bold text-gray-700 mb-4">
-                  TOTAL
-                </p>
+                      <span className="font-bold text-gray-700">
+                        Fund Balance
+                      </span>
 
-                <div className="space-y-3">
+                      <span className="font-bold text-pink-600">
+                        {formatMoney(fundBalance)}
+                      </span>
 
-                  <div className="flex justify-between gap-3">
-
-                    <span className="text-gray-600">
-                      Total Cash In
-                    </span>
-
-                    <span className="font-bold text-green-600">
-                      {formatMoney(totalCashIn)}
-                    </span>
-
-                  </div>
-
-                  <div className="flex justify-between gap-3">
-
-                    <span className="text-gray-600">
-                      Total Cash Out
-                    </span>
-
-                    <span className="font-bold text-red-500">
-                      {formatMoney(totalCashOut)}
-                    </span>
-
-                  </div>
-
-                  <div className="border-t pt-3 flex justify-between gap-3">
-
-                    <span className="font-bold text-gray-700">
-                      Fund Balance
-                    </span>
-
-                    <span className="font-bold text-pink-600">
-                      {formatMoney(fundBalance)}
-                    </span>
+                    </div>
 
                   </div>
 
                 </div>
 
-              </div>
+              )}
 
-            )}
+            </div>
 
           </div>
 
         </div>
-
       </div>
 
-      {/* EDIT REQUEST MODAL */}
+      {/* ================================
+          PRINTABLE FINANCIAL REPORT
+      ================================= */}
+
+      <div className="hidden print:block bg-white text-black">
+
+        <div className="max-w-full mx-auto">
+
+          {/* REPORT HEADER */}
+
+          <div className="text-center border-b-2 border-black pb-5 mb-6">
+
+            <h1 className="text-3xl font-bold tracking-wide">
+              CLASSFUND FINANCIAL REPORT
+            </h1>
+
+            <p className="text-lg font-semibold mt-2">
+              Class Treasurer Financial Record
+            </p>
+
+            <p className="text-sm mt-2">
+              Official Record of Cash Receipts and Disbursements
+            </p>
+
+            {printDate && (
+              <p className="text-sm mt-2">
+                Printed: {printDate}
+              </p>
+            )}
+
+          </div>
+
+          {/* SUMMARY */}
+
+          <div className="grid grid-cols-3 gap-4 mb-8">
+
+            <div className="border border-black p-4">
+              <p className="text-sm font-semibold">
+                TOTAL CASH IN
+              </p>
+
+              <p className="text-xl font-bold mt-2">
+                {formatMoney(totalCashIn)}
+              </p>
+            </div>
+
+            <div className="border border-black p-4">
+              <p className="text-sm font-semibold">
+                TOTAL CASH OUT
+              </p>
+
+              <p className="text-xl font-bold mt-2">
+                {formatMoney(totalCashOut)}
+              </p>
+            </div>
+
+            <div className="border border-black p-4">
+              <p className="text-sm font-semibold">
+                FUND BALANCE
+              </p>
+
+              <p className="text-xl font-bold mt-2">
+                {formatMoney(fundBalance)}
+              </p>
+            </div>
+
+          </div>
+
+          {/* TRANSACTION TABLE */}
+
+          <table className="w-full border-collapse border border-black text-sm">
+
+            <thead>
+
+              <tr className="border-b-2 border-black">
+
+                <th className="border border-black p-3 text-left">
+                  DATE
+                </th>
+
+                <th className="border border-black p-3 text-left">
+                  PARTICULARS
+                </th>
+
+                <th className="border border-black p-3 text-right">
+                  CASH IN
+                </th>
+
+                <th className="border border-black p-3 text-right">
+                  CASH OUT
+                </th>
+
+                <th className="border border-black p-3 text-right">
+                  FUND BALANCE
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {transactions.length === 0 ? (
+
+                <tr>
+
+                  <td
+                    colSpan={5}
+                    className="border border-black p-5 text-center"
+                  >
+                    No transactions recorded.
+                  </td>
+
+                </tr>
+
+              ) : (
+
+                transactions.map(
+                  (transaction, index) => (
+
+                    <tr
+                      key={transaction.id}
+                      className="border-b border-black"
+                    >
+
+                      <td className="border border-black p-3">
+                        {transaction.date}
+                      </td>
+
+                      <td className="border border-black p-3">
+                        {transaction.particulars}
+                      </td>
+
+                      <td className="border border-black p-3 text-right">
+                        {transaction.cashIn > 0
+                          ? formatMoney(
+                              transaction.cashIn
+                            )
+                          : "—"}
+                      </td>
+
+                      <td className="border border-black p-3 text-right">
+                        {transaction.cashOut > 0
+                          ? formatMoney(
+                              transaction.cashOut
+                            )
+                          : "—"}
+                      </td>
+
+                      <td className="border border-black p-3 text-right font-semibold">
+                        {formatMoney(
+                          getBalance(index)
+                        )}
+                      </td>
+
+                    </tr>
+
+                  )
+                )
+
+              )}
+
+            </tbody>
+
+            <tfoot>
+
+              <tr className="font-bold">
+
+                <td
+                  colSpan={2}
+                  className="border border-black p-3 text-right"
+                >
+                  TOTAL
+                </td>
+
+                <td className="border border-black p-3 text-right">
+                  {formatMoney(totalCashIn)}
+                </td>
+
+                <td className="border border-black p-3 text-right">
+                  {formatMoney(totalCashOut)}
+                </td>
+
+                <td className="border border-black p-3 text-right">
+                  {formatMoney(fundBalance)}
+                </td>
+
+              </tr>
+
+            </tfoot>
+
+          </table>
+
+          {/* CERTIFICATION */}
+
+          <div className="mt-8 text-sm">
+
+            <p>
+              <strong>Certification:</strong>
+            </p>
+
+            <p className="mt-2 leading-relaxed">
+              I hereby certify that the above financial report
+              represents the recorded cash transactions of the
+              ClassFund and that the balances shown are based on
+              the transactions recorded in the system.
+            </p>
+
+          </div>
+
+         {/* SIGNATURES */}
+
+<div className="grid grid-cols-3 gap-10 mt-16">
+
+  {/* TREASURER */}
+  <div className="text-center">
+    <div className="h-10"></div>
+    <div className="border-b border-black mb-2"></div>
+
+    <p className="text-sm font-semibold">
+      PREPARED BY
+    </p>
+
+    <p className="font-bold mt-1">
+      TREASURER
+    </p>
+  </div>
+
+  {/* AUDITOR */}
+  <div className="text-center">
+    <div className="h-10"></div>
+    <div className="border-b border-black mb-2"></div>
+
+    <p className="text-sm font-semibold">
+      PREPARED BY
+    </p>
+
+    <p className="font-bold mt-1">
+      AUDITOR
+    </p>
+  </div>
+
+  {/* PRESIDENT */}
+  <div className="text-center">
+    <div className="h-10"></div>
+    <div className="border-b border-black mb-2"></div>
+
+    <p className="text-sm font-semibold">
+      CHECKED AND VERIFIED BY
+    </p>
+
+    <p className="font-bold mt-1">
+      PRESIDENT
+    </p>
+  </div>
+
+</div>
+{/* Adviser */}
+  <div className="text-center">
+    <div className="h-10"></div>
+     <div className="w-48 mx-auto border-b border-black mb-2"></div>
+
+
+    <p className="text-sm font-semibold">
+      CHECKED AND VERIFIED BY
+    </p>
+
+    <p className="font-bold mt-1">
+      ADVISER
+    </p>
+  </div>
+
+</div>
+
+        </div>
+
+      
+
+      {/* ================================
+          EDIT REQUEST MODAL
+      ================================= */}
 
       {requestingId && (
 
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 print:hidden">
 
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6">
 
@@ -1224,6 +1514,48 @@ export default function ClassFundPage() {
         </div>
 
       )}
+
+      {/* ================================
+          PRINT CSS
+      ================================= */}
+
+      <style jsx global>{`
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 12mm;
+          }
+
+          html,
+          body {
+            background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          table {
+            page-break-inside: auto;
+          }
+
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          tfoot {
+            display: table-footer-group;
+          }
+        }
+      `}</style>
 
     </main>
   );
